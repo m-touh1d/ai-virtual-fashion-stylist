@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GRWMVS — Your Style Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #FFF5E4; --cream2: #FFE3B3; --orange: #FFB347;
+      --orange-deep: #F28C28; --brown: #7A4A1E;
+      --text-dark: #2E1A06; --text-mid: #6B3F10;
+      --white: #FFFDF8; --shadow: rgba(122,74,30,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); min-height: 100vh; }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 68px; background: rgba(255,245,228,0.95); border-bottom: 1px solid rgba(242,140,40,0.2); position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--brown); letter-spacing: 2px; text-decoration: none; }
+    .nav-logo span { color: var(--orange-deep); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .ai-nav-badge { display:none; background: var(--text-dark); color: var(--cream2); font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; }
+    .back-btn { display: flex; align-items: center; gap: 8px; background: transparent; border: 1.5px solid var(--orange); border-radius: 24px; padding: 8px 20px; font-size: 13px; font-weight: 500; color: var(--brown); cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; transition: all .2s; }
+    .back-btn:hover { background: var(--cream2); }
+
+    .studio { max-width: 1200px; margin: 0 auto; padding: 40px 24px; display: grid; grid-template-columns: 1fr 400px; gap: 32px; }
+
+    .photo-panel { background: var(--white); border: 1px solid rgba(255,179,71,0.3); border-radius: 24px; padding: 28px; box-shadow: 0 4px 24px var(--shadow); }
+    .panel-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+    .photo-panel h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-dark); }
+    .ai-badge { display:none; background: var(--text-dark); color: var(--cream2); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 10px; }
+    .photo-panel > p { font-size: 13px; color: var(--text-mid); margin-bottom: 20px; }
+    .gender-badge { display: inline-block; background: var(--cream2); border: 1px solid var(--orange); color: var(--brown); font-size: 12px; font-weight: 500; padding: 4px 14px; border-radius: 20px; margin-bottom: 16px; }
+    .tried-badge  { background: #1a7a1a; color: white; font-size: 12px; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; display: inline-block; }
+
+    .photo-tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid var(--cream2); }
+    .photo-tab { font-size: 13px; font-weight: 500; padding: 8px 0; margin-right: 24px; color: var(--text-mid); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .2s; }
+    .photo-tab.active { color: var(--orange-deep); border-color: var(--orange-deep); }
+
+    .photo-wrap { position: relative; display: inline-block; width: 100%; }
+    .photo-wrap img { width: 100%; max-height: 85vh; object-fit: contain; border-radius: 16px; display: block; }
+    .result-wrap { display: none; text-align: center; }
+    .result-wrap img { width: 100%; max-height: 85vh; object-fit: contain; border-radius: 16px; border: 2px solid var(--orange); }
+    .result-label { margin-top: 10px; font-size: 13px; color: var(--text-mid); }
+
+    .zones-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+    .zone { position: absolute; cursor: pointer; border-radius: 8px; transition: background .2s; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; }
+    .zone:hover { background: rgba(242,140,40,0.25) !important; border-color: var(--orange-deep); }
+    .zone-label { background: rgba(242,140,40,0.92); color: white; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 10px; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; }
+    .zone:hover .zone-label, .zone.active .zone-label { opacity: 1; }
+    .zone.active { background: rgba(242,140,40,0.2) !important; border-color: var(--orange-deep); }
+    .zone-face  { top: 2%;  left: 34%; width: 32%; height: 16%; background: rgba(255,179,71,0.06); }
+    .zone-neck  { top: 18%; left: 40%; width: 20%; height: 5%;  background: rgba(255,179,71,0.06); }
+    .zone-chest { top: 22%; left: 24%; width: 52%; height: 30%; background: rgba(255,179,71,0.06); }
+    .zone-legs  { top: 52%; left: 26%; width: 48%; height: 32%; background: rgba(255,179,71,0.06); }
+    .zone-feet  { top: 84%; left: 28%; width: 44%; height: 13%; background: rgba(255,179,71,0.06); }
+
+    .items-panel { display: flex; flex-direction: column; gap: 16px; }
+    .items-card { background: var(--white); border: 1px solid rgba(255,179,71,0.3); border-radius: 20px; padding: 24px; box-shadow: 0 4px 24px var(--shadow); }
+    .items-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .items-card .subtitle { font-size: 12px; color: var(--text-mid); margin-bottom: 16px; }
+    .instruction-card { text-align: center; padding: 32px 24px; }
+    .instruction-icon { font-size: 44px; margin-bottom: 12px; }
+    .instruction-card h3 { font-size: 17px; color: var(--text-dark); margin-bottom: 8px; }
+    .instruction-card p { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+    .zone-buttons { display: flex; flex-direction: column; gap: 8px; }
+    .zone-btn { display: flex; align-items: center; gap: 12px; background: var(--cream); border: 1.5px solid var(--cream2); border-radius: 12px; padding: 12px 16px; cursor: pointer; transition: all .2s; text-align: left; font-family: 'DM Sans', sans-serif; width: 100%; }
+    .zone-btn:hover, .zone-btn.active { border-color: var(--orange-deep); background: rgba(242,140,40,0.07); }
+    .zone-btn-icon { font-size: 22px; }
+    .zone-btn-text { font-size: 13px; font-weight: 500; color: var(--text-dark); }
+    .zone-btn-sub  { font-size: 11px; color: var(--text-mid); }
+
+    .fashion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+    .fashion-item { background: var(--cream); border: 1.5px solid var(--cream2); border-radius: 14px; padding: 10px; cursor: pointer; transition: all .2s; text-align: center; position: relative; }
+    .fashion-item:hover { border-color: var(--orange-deep); background: rgba(242,140,40,0.07); transform: translateY(-2px); box-shadow: 0 4px 16px var(--shadow); }
+    .fashion-item.selected { border-color: var(--orange-deep); background: rgba(242,140,40,0.12); }
+    .item-img-wrap { width: 100%; height: 90px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden; border-radius: 8px; background: white; }
+    .item-img-wrap img { max-width: 100%; max-height: 85px; object-fit: contain; }
+    .item-emoji-fallback { font-size: 36px; }
+    .item-name  { font-size: 11px; font-weight: 500; color: var(--text-dark); margin-bottom: 2px; line-height: 1.3; }
+    .item-brand { font-size: 10px; color: var(--text-mid); margin-bottom: 2px; }
+    .item-price { font-size: 11px; font-weight: 600; color: var(--orange-deep); margin-bottom: 2px; }
+    .item-trend { font-size: 10px; color: var(--brown); background: var(--cream2); padding: 2px 6px; border-radius: 8px; display: inline-block; }
+    .selected-tick { position: absolute; top: 6px; right: 6px; background: var(--orange-deep); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: none; align-items: center; justify-content: center; }
+    .fashion-item.selected .selected-tick { display: flex; }
+
+    .try-on-btn { width: 100%; margin-top: 12px; background: var(--orange-deep); color: var(--white); border: none; border-radius: 12px; padding: 11px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; }
+    .try-on-btn:hover { background: var(--brown); }
+    .try-on-btn:disabled { background: var(--cream2); color: var(--text-mid); cursor: not-allowed; }
+
+    .outfit-summary { background: var(--white); border: 1px solid rgba(255,179,71,0.3); border-radius: 20px; padding: 20px 24px; box-shadow: 0 4px 24px var(--shadow); }
+    .outfit-summary h3 { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; }
+    .outfit-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--cream2); font-size: 13px; color: var(--text-mid); }
+    .outfit-row:last-of-type { border-bottom: none; }
+    .outfit-row span { color: var(--text-dark); font-weight: 500; }
+    .complete-btn { width: 100%; margin-top: 14px; background: var(--orange-deep); color: var(--white); border: none; border-radius: 14px; padding: 13px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; }
+    .complete-btn:hover { background: var(--brown); }
+    .save-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--cream2); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; background: var(--cream); margin-top: 10px; margin-bottom: 8px; outline: none; }
+    .save-input:focus { border-color: var(--orange); }
+    .save-btn { width: 100%; background: var(--brown); color: var(--white); border: none; border-radius: 14px; padding: 13px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; }
+    .save-btn:hover { background: var(--text-dark); }
+
+    .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text-dark); color: var(--cream); padding: 12px 28px; border-radius: 30px; font-size: 14px; z-index: 999; transition: transform .3s ease; pointer-events: none; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .spinner-overlay { display: none; position: fixed; inset: 0; background: rgba(46,26,6,0.5); z-index: 500; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+    .spinner-overlay.show { display: flex; }
+    .spinner { width: 52px; height: 52px; border: 5px solid var(--cream2); border-top-color: var(--orange-deep); border-radius: 50%; animation: spin .8s linear infinite; }
+    .spinner-text { color: var(--cream); font-size: 15px; font-weight: 500; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media(max-width:900px) { .studio { grid-template-columns: 1fr; } }
+    @media(max-width:600px) { nav { padding: 0 20px; } .studio { padding: 20px 16px; } }
+  </style>
+</head>
+<body>
+
+<div class="spinner-overlay" id="spinnerOverlay">
+  <div class="spinner"></div>
+  <div class="spinner-text">✨ AI is trying on your item...</div>
+</div>
+
+<nav>
+  <a href="/" class="nav-logo">GRWM<span>VS</span></a>
+  <div class="nav-right">
+    <span class="ai-nav-badge" id="aiNavBadge">🤖 AI Body Detected</span>
+    <a href="/trending/">🔥 Trending</a>
+    {% if user.is_authenticated %}<a href="/profile/" style="font-size:14px;color:var(--text-mid);text-decoration:none">👤 My Outfits</a>{% endif %}
+    <a href="/" class="back-btn">← Back to Home</a>
+  </div>
+</nav>
+
+<div class="studio">
+  <div class="photo-panel">
+    <div class="gender-badge">
+      {% if gender == 'male' %}🧔 Male{% elif gender == 'female' %}👩 Female{% else %}🧒 Kids{% endif %}
+    </div>
+    {% if tried_item %}<div class="tried-badge">✅ Tried on: {{ tried_item }}</div>{% endif %}
+    <div class="panel-header">
+      <h2>Click on any body part</h2>
+      <span class="ai-badge" id="aiBadge">🤖 AI Detected</span>
+    </div>
+    <p>Tap a zone to browse fashion — then click "Try It On"!</p>
+
+    <div class="photo-tabs">
+      <div class="photo-tab active" id="tab-original" onclick="showTab('original')">📸 Original</div>
+      {% if result_url %}<div class="photo-tab" id="tab-result" onclick="showTab('result')">✨ Try-On Result</div>{% endif %}
+    </div>
+
+    <div id="view-original">
+      <div class="photo-wrap" id="photoWrap">
+        <img src="{{ photo_url }}" alt="Your photo" id="userPhoto" onload="adjustZones()"/>
+        <div class="zones-overlay">
+          <div class="zone zone-face"  onclick="selectZone('face')"  id="zone-face"><div class="zone-label">👓 Face — Eyewear</div></div>
+          <div class="zone zone-neck"  onclick="selectZone('neck')"  id="zone-neck"><div class="zone-label">📿 Neck — Jewellery</div></div>
+          <div class="zone zone-chest" onclick="selectZone('chest')" id="zone-chest"><div class="zone-label">👕 Chest — Tops</div></div>
+          <div class="zone zone-legs"  onclick="selectZone('legs')"  id="zone-legs"><div class="zone-label">👖 Legs — Pants</div></div>
+          <div class="zone zone-feet"  onclick="selectZone('feet')"  id="zone-feet"><div class="zone-label">👟 Feet — Shoes</div></div>
+        </div>
+      </div>
+    </div>
+    {% if result_url %}
+    <div id="view-result" class="result-wrap">
+      <img src="{{ result_url }}" alt="Try-on result"/>
+      <div class="result-label">✨ {{ tried_item }} — AI Virtual Try-On</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="items-panel">
+    <div class="items-card">
+      <h3>Body Zones</h3>
+      <p class="subtitle">Click a zone on the photo or tap below</p>
+      <div class="zone-buttons">
+        <button class="zone-btn" id="btn-face"  onclick="selectZone('face')"><span class="zone-btn-icon">👓</span><div><div class="zone-btn-text">Face</div><div class="zone-btn-sub">Goggles, Sunglasses, Spectacles</div></div></button>
+        <button class="zone-btn" id="btn-neck"  onclick="selectZone('neck')"><span class="zone-btn-icon">📿</span><div><div class="zone-btn-text">Neck</div><div class="zone-btn-sub">Chains, Necklaces, Scarves</div></div></button>
+        <button class="zone-btn" id="btn-chest" onclick="selectZone('chest')"><span class="zone-btn-icon">👕</span><div><div class="zone-btn-text">Chest / Body</div><div class="zone-btn-sub">Tops, Shirts, Jackets</div></div></button>
+        <button class="zone-btn" id="btn-legs"  onclick="selectZone('legs')"><span class="zone-btn-icon">👖</span><div><div class="zone-btn-text">Legs</div><div class="zone-btn-sub">Pants, Jeans, Shorts</div></div></button>
+        <button class="zone-btn" id="btn-feet"  onclick="selectZone('feet')"><span class="zone-btn-icon">👟</span><div><div class="zone-btn-text">Feet</div><div class="zone-btn-sub">Shoes, Sneakers, Slippers</div></div></button>
+      </div>
+    </div>
+
+    <div class="items-card" id="fashionCard" style="display:none">
+      <h3 id="fashionTitle">Items</h3>
+      <p class="subtitle" id="fashionSubtitle">Trending picks for you</p>
+      <div class="fashion-grid" id="fashionGrid"></div>
+      <button class="try-on-btn" id="tryOnBtn" disabled onclick="tryOnItem()">👗 Try It On</button>
+    </div>
+
+    <div class="items-card instruction-card" id="instructionCard">
+      <div class="instruction-icon">👆</div>
+      <h3>Click a body zone</h3>
+      <p>Tap your photo or use the zone buttons to browse real fashion products — then hit "Try It On"!</p>
+    </div>
+
+    <div class="outfit-summary">
+      <h3>✨ My Outfit</h3>
+      <div class="outfit-row">👓 Eyewear: <span id="sum-face">Not selected</span></div>
+      <div class="outfit-row">📿 Neck: <span id="sum-neck">Not selected</span></div>
+      <div class="outfit-row">👕 Top: <span id="sum-chest">Not selected</span></div>
+      <div class="outfit-row">👖 Bottom: <span id="sum-legs">Not selected</span></div>
+      <div class="outfit-row">👟 Feet: <span id="sum-feet">Not selected</span></div>
+      <button class="complete-btn" onclick="completeOutfit()">🎨 Complete My Look</button>
+
+      {% if user.is_authenticated %}
+      <form method="POST" action="/save/" id="saveForm">
+        {% csrf_token %}
+        <input type="hidden" name="gender"     value="{{ gender }}"/>
+        <input type="hidden" name="photo_url"  value="{{ photo_url }}"/>
+        <input type="hidden" name="result_url" value="{{ result_url }}"/>
+        <input type="hidden" name="face_item"  id="save_face"  value=""/>
+        <input type="hidden" name="neck_item"  id="save_neck"  value=""/>
+        <input type="hidden" name="chest_item" id="save_chest" value=""/>
+        <input type="hidden" name="legs_item"  id="save_legs"  value=""/>
+        <input type="hidden" name="feet_item"  id="save_feet"  value=""/>
+        <input type="text" name="outfit_name" class="save-input" placeholder="Name your outfit (e.g. Weekend Casual)"/>
+        <button type="button" class="save-btn" onclick="saveOutfit()">💾 Save Outfit</button>
+      </form>
+      {% else %}
+      <p style="text-align:center;font-size:12px;color:var(--text-mid);margin-top:12px"><a href="/?modal=login" style="color:var(--orange-deep)">Sign in</a> to save your outfits</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<form method="POST" action="/tryon/" id="tryOnForm" style="display:none">
+  {% csrf_token %}
+  <input type="hidden" name="photo_path"  id="f_photo_path" value="{{ photo_url }}"/>
+  <input type="hidden" name="gender"      id="f_gender"     value="{{ gender }}"/>
+  <input type="hidden" name="item_name"   id="f_item_name"  value=""/>
+  <input type="hidden" name="zone"        id="f_zone"       value=""/>
+  <input type="hidden" name="zones"       id="f_zones"      value=""/>
+</form>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const gender     = "{{ gender }}";
+  const aiDetected = "{{ ai_detected }}" === "True";
+  const aiZones    = {{ zones|safe }};
+  const productsByZone = {{ products_by_zone|safe }};
+
+  const zoneTitles = {
+    face:  { title: '👓 Eyewear',          subtitle: 'Trending goggles, sunglasses & specs' },
+    neck:  { title: '📿 Neck & Jewellery', subtitle: 'Trending chains, necklaces & scarves' },
+    chest: { title: '👕 Tops & Shirts',    subtitle: 'Trending tops, shirts & jackets' },
+    legs:  { title: '👖 Pants & Bottoms',  subtitle: 'Trending pants, jeans & shorts' },
+    feet:  { title: '👟 Shoes & Footwear', subtitle: 'Trending sneakers, shoes & slippers' },
+  };
+  const zoneEmojis = { face:'🕶️', neck:'📿', chest:'👕', legs:'👖', feet:'👟' };
+
+  let selectedItems = { face:null, neck:null, chest:null, legs:null, feet:null };
+  let currentZone   = null;
+  let currentItem   = null;
+
+  document.getElementById('f_zones').value = JSON.stringify(aiZones);
+
+  function adjustZones() {
+    if (!aiDetected || !aiZones) return;
+    ['face','neck','chest','legs','feet'].forEach(zone => {
+      const el = document.getElementById('zone-' + zone);
+      if (el && aiZones[zone]) {
+        const z = aiZones[zone];
+        el.style.top    = z.top    + '%';
+        el.style.left   = z.left   + '%';
+        el.style.width  = z.width  + '%';
+        el.style.height = z.height + '%';
+      }
+    });
+    document.getElementById('aiBadge').style.display    = 'inline-block';
+    document.getElementById('aiNavBadge').style.display = 'inline-block';
+  }
+
+  function selectZone(zone) {
+    document.querySelectorAll('.zone').forEach(z => z.classList.remove('active'));
+    document.querySelectorAll('.zone-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('zone-' + zone).classList.add('active');
+    document.getElementById('btn-'  + zone).classList.add('active');
+    currentZone = zone; currentItem = null;
+
+    const info     = zoneTitles[zone];
+    const products = productsByZone[zone] || [];
+    document.getElementById('fashionTitle').textContent    = info.title;
+    document.getElementById('fashionSubtitle').textContent = info.subtitle;
+
+    const grid = document.getElementById('fashionGrid');
+    grid.innerHTML = '';
+    if (products.length === 0) {
+      grid.innerHTML = '<p style="grid-column:span 2;text-align:center;color:var(--text-mid);font-size:13px;padding:20px 0">No products for this zone yet.<br/>Add them in the admin panel!</p>';
+    } else {
+      products.forEach(product => {
+        const div = document.createElement('div');
+        div.className = 'fashion-item' + (selectedItems[zone] === product.name ? ' selected' : '');
+        const imgHtml = product.image
+          ? `<img src="${product.image}" alt="${product.name}" onerror="this.parentElement.innerHTML='<span class=item-emoji-fallback>${zoneEmojis[zone]}</span>'"/>`
+          : `<span class="item-emoji-fallback">${zoneEmojis[zone]}</span>`;
+        div.innerHTML = `
+          <div class="selected-tick">✓</div>
+          <div class="item-img-wrap">${imgHtml}</div>
+          <div class="item-name">${product.name}</div>
+          <div class="item-brand">${product.brand}</div>
+          <div class="item-price">₹${parseInt(product.price).toLocaleString('en-IN')}</div>
+          ${product.trend_label ? `<div class="item-trend">${product.trend_label}</div>` : ''}
+        `;
+        div.onclick = () => pickItem(zone, product.name, div);
+        grid.appendChild(div);
+      });
+    }
+    document.getElementById('fashionCard').style.display    = 'block';
+    document.getElementById('instructionCard').style.display = 'none';
+    document.getElementById('tryOnBtn').disabled = true;
+  }
+
+  function pickItem(zone, name, el) {
+    document.querySelectorAll('#fashionGrid .fashion-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedItems[zone] = name; currentItem = name;
+    document.getElementById('sum-' + zone).textContent = name;
+    document.getElementById('tryOnBtn').disabled = false;
+    showToast('✅ ' + name + ' selected — click "Try It On"!');
+  }
+
+  function tryOnItem() {
+    if (!currentItem || !currentZone) return;
+    document.getElementById('f_item_name').value = currentItem;
+    document.getElementById('f_zone').value      = currentZone;
+    document.getElementById('spinnerOverlay').classList.add('show');
+    document.getElementById('tryOnForm').submit();
+  }
+
+  function showTab(tab) {
+    document.getElementById('view-original').style.display = tab === 'original' ? 'block' : 'none';
+    const rv = document.getElementById('view-result');
+    if (rv) rv.style.display = tab === 'result' ? 'block' : 'none';
+    document.querySelectorAll('.photo-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+  }
+
+  {% if result_url %}
+  window.addEventListener('load', () => { showTab('result'); showToast('✨ Try-on complete!'); });
+  {% endif %}
+
+  function completeOutfit() {
+    const count = Object.values(selectedItems).filter(v => v !== null).length;
+    if (count === 0) { showToast('⚠️ Select at least one item first!'); return; }
+    showToast('🎉 Great look! ' + count + ' items selected.');
+  }
+
+  function saveOutfit() {
+    const count = Object.values(selectedItems).filter(v => v !== null).length;
+    if (count === 0) { showToast('⚠️ Select at least one item first!'); return; }
+    document.getElementById('save_face').value  = selectedItems.face  || '';
+    document.getElementById('save_neck').value  = selectedItems.neck  || '';
+    document.getElementById('save_chest').value = selectedItems.chest || '';
+    document.getElementById('save_legs').value  = selectedItems.legs  || '';
+    document.getElementById('save_feet').value  = selectedItems.feet  || '';
+    document.getElementById('saveForm').submit();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GRWMVS — Trending Now</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #FFF5E4; --cream2: #FFE3B3; --orange: #FFB347;
+      --orange-deep: #F28C28; --brown: #7A4A1E;
+      --text-dark: #2E1A06; --text-mid: #6B3F10;
+      --white: #FFFDF8; --shadow: rgba(122,74,30,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); }
+
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 68px;
+      background: rgba(255,245,228,0.95);
+      border-bottom: 1px solid rgba(242,140,40,0.2);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--brown); letter-spacing: 2px; text-decoration: none; }
+    .nav-logo span { color: var(--orange-deep); }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { text-decoration: none; font-size: 14px; font-weight: 500; color: var(--text-mid); transition: color .2s; }
+    .nav-links a:hover { color: var(--orange-deep); }
+    .nav-btn { background: var(--orange-deep); color: var(--white); border: none; border-radius: 24px; padding: 9px 22px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--cream2) 0%, var(--white) 100%);
+      padding: 60px 48px 40px; border-bottom: 1px solid rgba(255,179,71,0.25);
+    }
+    .hero-inner { max-width: 1100px; margin: 0 auto; }
+    .hero p  { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--orange-deep); font-weight: 500; margin-bottom: 10px; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px,5vw,56px); font-weight: 900; color: var(--text-dark); margin-bottom: 32px; }
+    .hero h1 em { font-style: italic; color: var(--orange-deep); }
+
+    /* FILTER BARS */
+    .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .filter-btn {
+      background: var(--white); border: 1.5px solid var(--cream2);
+      border-radius: 24px; padding: 8px 20px;
+      font-size: 13px; font-weight: 500; color: var(--text-mid);
+      cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif;
+      text-decoration: none; display: inline-block;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--orange-deep); color: var(--white);
+      border-color: var(--orange-deep);
+    }
+
+    /* PRODUCTS */
+    .section { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text-dark); margin-bottom: 28px; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 20px; }
+    .product-card {
+      background: var(--white); border: 1px solid rgba(255,179,71,0.3);
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 4px 16px var(--shadow); transition: all .2s;
+      cursor: pointer;
+    }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px var(--shadow); }
+    .product-img { width: 100%; height: 180px; object-fit: contain; background: var(--cream); padding: 12px; }
+    .product-img-placeholder { width: 100%; height: 180px; background: var(--cream2); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .product-info { padding: 14px; }
+    .product-name  { font-size: 13px; font-weight: 500; color: var(--text-dark); margin-bottom: 3px; }
+    .product-brand { font-size: 11px; color: var(--text-mid); margin-bottom: 6px; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; }
+    .product-price { font-size: 13px; font-weight: 600; color: var(--orange-deep); }
+    .product-trend { font-size: 10px; color: var(--brown); background: var(--cream2); padding: 2px 8px; border-radius: 10px; }
+    .product-cat   { font-size: 10px; color: var(--text-mid); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+
+    .empty-state { text-align: center; padding: 60px 24px; color: var(--text-mid); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    footer { background: var(--text-dark); color: rgba(255,245,228,0.7); text-align: center; padding: 24px; font-size: 13px; }
+    footer span { color: var(--orange); }
+
+    @media(max-width:600px) { nav { padding: 0 20px; } .hero { padding: 40px 20px 28px; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">GRWM<span>VS</span></a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/trending/" style="color:var(--orange-deep)">Trending</a>
+    {% if user.is_authenticated %}
+      <a href="/profile/">My Outfits</a>
+      <a href="/logout/">Sign Out</a>
+    {% else %}
+      <a href="/?modal=login" class="nav-btn">Sign In</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <p>✦ What's hot right now</p>
+    <h1>Trending <em>Styles</em></h1>
+
+    <!-- GENDER FILTER -->
+    <div class="filter-bar">
+      <a href="?gender=male&occasion={{ occasion }}"   class="filter-btn {% if gender == 'male' %}active{% endif %}">🧔 Male</a>
+      <a href="?gender=female&occasion={{ occasion }}" class="filter-btn {% if gender == 'female' %}active{% endif %}">👩 Female</a>
+      <a href="?gender=kids&occasion={{ occasion }}"   class="filter-btn {% if gender == 'kids' %}active{% endif %}">🧒 Kids</a>
+    </div>
+
+    <!-- OCCASION FILTER -->
+    <div class="filter-bar">
+      <a href="?gender={{ gender }}&occasion=all"     class="filter-btn {% if occasion == 'all' %}active{% endif %}">✨ All</a>
+      <a href="?gender={{ gender }}&occasion=casual"  class="filter-btn {% if occasion == 'casual' %}active{% endif %}">👕 Casual</a>
+      <a href="?gender={{ gender }}&occasion=party"   class="filter-btn {% if occasion == 'party' %}active{% endif %}">🎉 Party</a>
+      <a href="?gender={{ gender }}&occasion=wedding" class="filter-btn {% if occasion == 'wedding' %}active{% endif %}">💍 Wedding</a>
+      <a href="?gender={{ gender }}&occasion=gym"     class="filter-btn {% if occasion == 'gym' %}active{% endif %}">💪 Gym</a>
+      <a href="?gender={{ gender }}&occasion=office"  class="filter-btn {% if occasion == 'office' %}active{% endif %}">💼 Office</a>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2 class="section-title" id="productCount">Loading...</h2>
+  <div class="products-grid" id="productsGrid"></div>
+</div>
+
+<footer>
+  <p>© 2025 <span>GRWMVS</span> — Get Ready With Me Virtual Stylist</p>
+</footer>
+
+<script>
+  const products = {{ products|safe }};
+
+  const categoryEmojis = {
+    face: '👓', neck: '📿', chest: '👕', legs: '👖', feet: '👟'
+  };
+  const categoryNames = {
+    face: 'Eyewear', neck: 'Jewellery', chest: 'Tops', legs: 'Bottoms', feet: 'Footwear'
+  };
+
+  function render() {
+    const grid  = document.getElementById('productsGrid');
+    const count = document.getElementById('productCount');
+
+    if (products.length === 0) {
+      count.textContent = 'No products found';
+      grid.innerHTML = `<div class="empty-state" style="grid-column:span 5"><div class="icon">🛍️</div><p>No products for this filter yet.<br/>Add them in the admin panel!</p></div>`;
+      return;
+    }
+
+    count.textContent = `${products.length} Trending Items`;
+    grid.innerHTML = products.map(p => `
+      <div class="product-card">
+        ${p.image
+          ? `<img src="${p.image}" class="product-img" alt="${p.name}" onerror="this.parentElement.innerHTML='<div class=product-img-placeholder>${categoryEmojis[p.category]||'👗'}</div>'+this.parentElement.innerHTML.replace(this.outerHTML,'')"/>`
+          : `<div class="product-img-placeholder">${categoryEmojis[p.category] || '👗'}</div>`
+        }
+        <div class="product-info">
+          <div class="product-name">${p.name}</div>
+          <div class="product-brand">${p.brand}</div>
+          <div class="product-footer">
+            <div class="product-price">₹${parseInt(p.price).toLocaleString('en-IN')}</div>
+            ${p.trend_label ? `<div class="product-trend">${p.trend_label}</div>` : ''}
+          </div>
+          <div class="product-cat">${categoryEmojis[p.category]} ${categoryNames[p.category]}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  render();
+</script>
+</body>
+</html>

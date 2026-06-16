@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GRWMVS — Get Ready With Me Virtual Stylist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream:       #FFF5E4;
+      --cream2:      #FFE3B3;
+      --orange:      #FFB347;
+      --orange-deep: #F28C28;
+      --brown:       #7A4A1E;
+      --text-dark:   #2E1A06;
+      --text-mid:    #6B3F10;
+      --white:       #FFFDF8;
+      --shadow:      rgba(122,74,30,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
+
+    /* NAVBAR */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 68px;
+      background: rgba(255,245,228,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(242,140,40,0.2);
+    }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--brown); letter-spacing: 2px; text-decoration: none; }
+    .nav-logo span { color: var(--orange-deep); }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { text-decoration: none; font-size: 14px; font-weight: 500; color: var(--text-mid); transition: color .2s; }
+    .nav-links a:hover { color: var(--orange-deep); }
+    .nav-user { font-size: 14px; font-weight: 500; color: var(--brown); }
+    .nav-btn { background: var(--orange-deep); color: var(--white); border: none; border-radius: 24px; padding: 9px 22px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; }
+    .nav-btn:hover { background: var(--brown); }
+    .nav-btn-out { background: transparent; color: var(--brown); border: 1.5px solid var(--orange); border-radius: 24px; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; transition: background .2s; }
+    .nav-btn-out:hover { background: var(--cream2); }
+
+    /* MESSAGES */
+    .messages-box { position: fixed; top: 76px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; min-width: 320px; }
+    .msg { padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 500; text-align: center; animation: fadeUp .3s ease; box-shadow: 0 4px 16px var(--shadow); }
+    .msg-success { background: #2E1A06; color: var(--cream); }
+    .msg-error   { background: #b54a1e; color: var(--white); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 120px 24px 80px;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 20%, rgba(255,179,71,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 90% 80%, rgba(242,140,40,0.14) 0%, transparent 60%);
+    }
+    .hero-badge { display: inline-block; background: var(--cream2); border: 1px solid var(--orange); color: var(--brown); font-size: 12px; font-weight: 500; padding: 5px 16px; border-radius: 20px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 28px; animation: fadeUp .6s ease both; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(44px,8vw,88px); font-weight: 900; line-height: 1.05; animation: fadeUp .7s .1s ease both; }
+    .hero h1 em { font-style: italic; color: var(--orange-deep); }
+    .hero-sub { max-width: 520px; margin: 24px auto 0; font-size: 17px; font-weight: 300; line-height: 1.7; color: var(--text-mid); animation: fadeUp .7s .2s ease both; }
+    .hero-actions { display: flex; gap: 16px; margin-top: 44px; justify-content: center; flex-wrap: wrap; animation: fadeUp .7s .3s ease both; }
+    .btn-primary { background: var(--orange-deep); color: var(--white); border: none; border-radius: 32px; padding: 15px 36px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; box-shadow: 0 4px 20px rgba(242,140,40,0.35); transition: all .2s; text-decoration: none; display: inline-block; }
+    .btn-primary:hover { background: var(--brown); transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--brown); border: 1.5px solid var(--orange); border-radius: 32px; padding: 15px 36px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; text-decoration: none; display: inline-block; }
+    .btn-outline:hover { background: var(--cream2); transform: translateY(-2px); }
+    .style-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 48px; animation: fadeUp .7s .45s ease both; }
+    .style-tag { background: var(--white); border: 1px solid var(--cream2); color: var(--text-mid); font-size: 13px; padding: 6px 16px; border-radius: 20px; box-shadow: 0 2px 8px var(--shadow); }
+
+    /* HOW IT WORKS */
+    .section { max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
+    .section-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--orange-deep); font-weight: 500; margin-bottom: 12px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px,4vw,42px); font-weight: 700; color: var(--text-dark); margin-bottom: 52px; }
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 24px; }
+    .step-card { background: var(--white); border: 1px solid rgba(255,179,71,0.3); border-radius: 20px; padding: 32px 28px; box-shadow: 0 4px 24px var(--shadow); transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; }
+    .step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--orange), var(--orange-deep)); }
+    .step-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px var(--shadow); }
+    .step-num { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; color: var(--cream2); line-height: 1; margin-bottom: 16px; }
+    .step-card h3 { font-size: 16px; font-weight: 500; color: var(--text-dark); margin-bottom: 8px; }
+    .step-card p  { font-size: 13px; font-weight: 300; color: var(--text-mid); line-height: 1.6; }
+
+    /* TRENDING SECTION */
+    .trending-section { background: linear-gradient(135deg, var(--cream2) 0%, var(--white) 100%); border-top: 1px solid rgba(255,179,71,0.25); border-bottom: 1px solid rgba(255,179,71,0.25); padding: 80px 24px; }
+    .trending-inner { max-width: 1100px; margin: 0 auto; }
+    .trending-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+    .t-filter { background: var(--white); border: 1.5px solid var(--cream2); border-radius: 24px; padding: 8px 20px; font-size: 13px; font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+    .t-filter:hover, .t-filter.active { background: var(--orange-deep); color: var(--white); border-color: var(--orange-deep); }
+    .trending-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 16px; margin-bottom: 32px; }
+    .t-card { background: var(--white); border: 1px solid rgba(255,179,71,0.3); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px var(--shadow); transition: all .2s; cursor: pointer; }
+    .t-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px var(--shadow); }
+    .t-card-img { width: 100%; height: 150px; object-fit: contain; background: var(--cream); padding: 10px; }
+    .t-card-placeholder { width: 100%; height: 150px; background: var(--cream2); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    .t-card-body { padding: 12px; }
+    .t-card-name  { font-size: 12px; font-weight: 500; color: var(--text-dark); margin-bottom: 3px; }
+    .t-card-brand { font-size: 11px; color: var(--text-mid); margin-bottom: 6px; }
+    .t-card-price { font-size: 12px; font-weight: 600; color: var(--orange-deep); }
+    .t-card-trend { font-size: 10px; color: var(--brown); background: var(--cream2); padding: 2px 7px; border-radius: 8px; display: inline-block; margin-top: 4px; }
+
+    /* TRY IT SECTION */
+    .try-section { padding: 80px 24px; }
+    .try-inner { max-width: 860px; margin: 0 auto; }
+    .gender-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+    .gender-card { flex: 1; min-width: 120px; background: var(--white); border: 2px solid var(--cream2); border-radius: 16px; padding: 20px 16px; text-align: center; cursor: pointer; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .gender-card:hover, .gender-card.active { border-color: var(--orange-deep); background: rgba(242,140,40,0.06); transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+    .gender-icon  { font-size: 32px; }
+    .gender-label { font-size: 14px; font-weight: 500; color: var(--text-dark); }
+    .step-label { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 14px; }
+    .upload-area { border: 2px dashed var(--orange); border-radius: 20px; padding: 52px 24px; text-align: center; background: var(--white); cursor: pointer; transition: all .2s; margin-bottom: 24px; }
+    .upload-area:hover { border-color: var(--orange-deep); background: rgba(255,245,228,0.7); }
+    .upload-area.dragover { border-color: var(--orange-deep); background: rgba(242,140,40,0.07); }
+    .upload-icon  { font-size: 44px; margin-bottom: 12px; }
+    .upload-title { font-size: 17px; font-weight: 500; color: var(--text-dark); margin-bottom: 6px; }
+    .upload-sub   { font-size: 13px; color: var(--text-mid); margin-bottom: 20px; }
+    #preview-img  { max-width: 100%; max-height: 340px; border-radius: 14px; margin-top: 16px; display: none; }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(46,26,6,0.55); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 24px; padding: 40px 36px; max-width: 420px; width: 90%; position: relative; box-shadow: 0 24px 64px rgba(46,26,6,0.25); animation: popIn .3s ease; }
+    .modal h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+    .modal-sub { font-size: 14px; color: var(--text-mid); margin-bottom: 28px; }
+    .tab-row { display: flex; margin-bottom: 28px; border-bottom: 2px solid var(--cream2); }
+    .tab { font-size: 14px; font-weight: 500; padding: 10px 0; margin-right: 28px; color: var(--text-mid); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .2s; }
+    .tab.active { color: var(--orange-deep); border-color: var(--orange-deep); }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--brown); margin-bottom: 6px; letter-spacing: .5px; }
+    .form-group input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--cream2); border-radius: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); outline: none; transition: border .2s; }
+    .form-group input:focus { border-color: var(--orange); }
+    .modal-submit { width: 100%; background: var(--orange-deep); color: var(--white); border: none; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; margin-top: 4px; }
+    .modal-submit:hover { background: var(--brown); }
+    .modal-close { position: absolute; top: 16px; right: 20px; font-size: 22px; cursor: pointer; color: var(--text-mid); background: none; border: none; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* FOOTER */
+    footer { background: var(--text-dark); color: rgba(255,245,228,0.7); text-align: center; padding: 28px 24px; font-size: 13px; }
+    footer span { color: var(--orange); }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text-dark); color: var(--cream); padding: 12px 28px; border-radius: 30px; font-size: 14px; z-index: 999; transition: transform .3s ease; pointer-events: none; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes popIn  { from { opacity:0; transform:scale(.94); }      to { opacity:1; transform:scale(1); } }
+
+    @media(max-width:600px) { nav { padding: 0 20px; } .hero h1 { font-size: 38px; } .steps-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="/" class="nav-logo">GRWM<span>VS</span></a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#try">Try it</a>
+    <a href="/trending/">🔥 Trending</a>
+    {% if user.is_authenticated %}
+      <a href="/profile/">👤 My Outfits</a>
+      <span class="nav-user">👋 {{ user.first_name }}</span>
+      <a href="/logout/" class="nav-btn-out">Sign Out</a>
+    {% else %}
+      <button class="nav-btn" onclick="openModal('login')">Sign In</button>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="messages-box">
+  {% for message in messages %}
+    <div class="msg {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">{{ message }}</div>
+  {% endfor %}
+</div>
+<script>setTimeout(() => { document.querySelectorAll('.msg').forEach(m => m.style.opacity='0'); }, 3500);</script>
+{% endif %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✦ AI-Powered Virtual Stylist</div>
+  <h1>Get Ready<br/>With <em>Style.</em></h1>
+  <p class="hero-sub">Upload your photo, click any body part, and discover trending fashion curated just for you — virtually tried on in seconds.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('try').scrollIntoView({behavior:'smooth'})">Try It Now →</button>
+    {% if not user.is_authenticated %}
+    <button class="btn-outline" onclick="openModal('register')">Create Free Account</button>
+    {% endif %}
+  </div>
+  <div class="style-tags">
+    <span class="style-tag">👓 Goggles &amp; Glasses</span>
+    <span class="style-tag">📿 Chains &amp; Jewellery</span>
+    <span class="style-tag">👕 Tops &amp; Shirts</span>
+    <span class="style-tag">👖 Pants &amp; Bottoms</span>
+    <span class="style-tag">👟 Shoes &amp; Slippers</span>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="section">
+  <p class="section-label">How it works</p>
+  <h2 class="section-title">Four simple steps to<br/>your perfect look</h2>
+  <div class="steps-grid">
+    <div class="step-card"><div class="step-num">01</div><h3>Choose your style profile</h3><p>Select Male, Female, or Kids to get fashion recommendations tailored to you.</p></div>
+    <div class="step-card"><div class="step-num">02</div><h3>Upload your full-body photo</h3><p>A head-to-toe photo works best so our AI can detect your body landmarks accurately.</p></div>
+    <div class="step-card"><div class="step-num">03</div><h3>Click any body part</h3><p>Tap face for eyewear, neck for chains, body for tops, legs for pants, feet for shoes.</p></div>
+    <div class="step-card"><div class="step-num">04</div><h3>AI tries it on you</h3><p>Our AI overlays the selected item on your photo so you can see it realistically.</p></div>
+  </div>
+</section>
+
+<!-- TRENDING SECTION -->
+<div class="trending-section">
+  <div class="trending-inner">
+    <p class="section-label">What's hot right now</p>
+    <h2 class="section-title" style="margin-bottom:24px">Trending <em style="font-style:italic;color:var(--orange-deep)">Picks</em></h2>
+    <div class="trending-filters">
+      <button class="t-filter active" onclick="filterTrending('all',this)">✨ All</button>
+      <button class="t-filter" onclick="filterTrending('face',this)">👓 Eyewear</button>
+      <button class="t-filter" onclick="filterTrending('chest',this)">👕 Tops</button>
+      <button class="t-filter" onclick="filterTrending('legs',this)">👖 Bottoms</button>
+      <button class="t-filter" onclick="filterTrending('feet',this)">👟 Shoes</button>
+      <button class="t-filter" onclick="filterTrending('neck',this)">📿 Jewellery</button>
+    </div>
+    <div class="trending-grid" id="trendingGrid"></div>
+    <div style="text-align:center">
+      <a href="/trending/" class="btn-primary">See All Trending →</a>
+    </div>
+  </div>
+</div>
+
+<!-- TRY IT -->
+<div class="try-section" id="try">
+  <div class="try-inner">
+    <p class="section-label">Get Started</p>
+    <h2 class="section-title" style="margin-bottom:32px">Try GRWMVS right now</h2>
+    <p class="step-label">Step 1 — Who are you styling?</p>
+    <div class="gender-row">
+      <div class="gender-card" onclick="selectGender(this,'male')"><div class="gender-icon">🧔</div><div class="gender-label">Male</div></div>
+      <div class="gender-card" onclick="selectGender(this,'female')"><div class="gender-icon">👩</div><div class="gender-label">Female</div></div>
+      <div class="gender-card" onclick="selectGender(this,'kids')"><div class="gender-icon">🧒</div><div class="gender-label">Kids</div></div>
+    </div>
+    <p class="step-label">Step 2 — Upload your full-body photo</p>
+    <form method="POST" action="/upload/" enctype="multipart/form-data" id="uploadForm">
+      {% csrf_token %}
+      <input type="hidden" name="gender" id="genderInput" value=""/>
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+        <div class="upload-icon" id="uploadIcon">📸</div>
+        <div class="upload-title" id="uploadTitle">Click to upload or drag &amp; drop</div>
+        <div class="upload-sub"   id="uploadSub">Full-body photo recommended · JPG, PNG, WEBP up to 10MB</div>
+        <button type="button" class="btn-primary" style="pointer-events:none;font-size:13px;padding:10px 24px;">Choose Photo</button>
+        <input type="file" name="photo" id="photoInput" style="display:none" accept="image/*" onchange="previewPhoto(event)"/>
+        <img id="preview-img" alt="Preview"/>
+      </div>
+      <button type="button" class="btn-primary" style="width:100%;padding:16px;font-size:16px;" onclick="submitStyle()">✨ Analyse My Style</button>
+    </form>
+    <p style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-mid);">🔒 Your photo is processed securely and never shared.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <span>GRWMVS</span> — Get Ready With Me Virtual Stylist &nbsp;·&nbsp; Built with Django + AI</p>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>Welcome to <span style="color:var(--orange-deep)">GRWMVS</span></h2>
+    <p class="modal-sub">Sign in or create your free stylist account</p>
+    <div class="tab-row">
+      <div class="tab active" id="tab-login"    onclick="switchTab('login')">Sign In</div>
+      <div class="tab"        id="tab-register" onclick="switchTab('register')">Register</div>
+    </div>
+    <div class="panel active" id="panel-login">
+      <form method="POST" action="/login/">
+        {% csrf_token %}
+        <div class="form-group"><label>EMAIL ADDRESS</label><input type="email" name="email" placeholder="you@example.com" required/></div>
+        <div class="form-group"><label>PASSWORD</label><input type="password" name="password" placeholder="Enter your password" required/></div>
+        <button type="submit" class="modal-submit">Sign In →</button>
+      </form>
+    </div>
+    <div class="panel" id="panel-register">
+      <form method="POST" action="/register/">
+        {% csrf_token %}
+        <div class="form-group"><label>FULL NAME</label><input type="text" name="name" placeholder="Your name" required/></div>
+        <div class="form-group"><label>EMAIL ADDRESS</label><input type="email" name="email" placeholder="you@example.com" required/></div>
+        <div class="form-group"><label>PASSWORD</label><input type="password" name="password" placeholder="Create a password" required/></div>
+        <button type="submit" class="modal-submit">Create Account →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── MODAL ── */
+  function openModal(tab)  { document.getElementById('modalOverlay').classList.add('open'); if(tab) switchTab(tab); }
+  function closeModal()    { document.getElementById('modalOverlay').classList.remove('open'); }
+  function handleOverlayClick(e) { if(e.target.id==='modalOverlay') closeModal(); }
+  function switchTab(tab) {
+    ['login','register'].forEach(t => {
+      document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+      document.getElementById('panel-'+t).classList.toggle('active', t===tab);
+    });
+  }
+
+  /* ── GENDER ── */
+  let selectedGender = null;
+  function selectGender(el, gender) {
+    document.querySelectorAll('.gender-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    selectedGender = gender;
+    document.getElementById('genderInput').value = gender;
+  }
+
+  /* ── UPLOAD ── */
+  function previewPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const img = document.getElementById('preview-img');
+    img.src = URL.createObjectURL(file);
+    img.style.display = 'block';
+    document.getElementById('uploadIcon').style.display  = 'none';
+    document.getElementById('uploadTitle').textContent   = '✅ Photo uploaded!';
+    document.getElementById('uploadSub').textContent     = file.name;
+  }
+  function dragOver(e)  { e.preventDefault(); document.getElementById('uploadArea').classList.add('dragover'); }
+  function dragLeave(e) { document.getElementById('uploadArea').classList.remove('dragover'); }
+  function dropFile(e)  {
+    e.preventDefault();
+    document.getElementById('uploadArea').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const dt = new DataTransfer(); dt.items.add(file);
+      document.getElementById('photoInput').files = dt.files;
+      const img = document.getElementById('preview-img');
+      img.src = URL.createObjectURL(file); img.style.display = 'block';
+      document.getElementById('uploadIcon').style.display = 'none';
+      document.getElementById('uploadTitle').textContent  = '✅ Photo dropped!';
+      document.getElementById('uploadSub').textContent    = file.name;
+    }
+  }
+  function submitStyle() {
+    if (!selectedGender) { showToast('⚠️ Please select Male, Female, or Kids first'); return; }
+    const photo = document.getElementById('photoInput').files[0];
+    if (!photo) { showToast('⚠️ Please upload your photo first'); return; }
+    document.getElementById('uploadForm').submit();
+  }
+
+  /* ── TRENDING ── */
+  const trendingData = {{ trending|safe }};
+  const catEmojis = { face:'👓', neck:'📿', chest:'👕', legs:'👖', feet:'👟' };
+  let currentFilter = 'all';
+
+  function filterTrending(cat, btn) {
+    currentFilter = cat;
+    document.querySelectorAll('.t-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTrending();
+  }
+
+  function renderTrending() {
+    const grid = document.getElementById('trendingGrid');
+    let products = [];
+    if (currentFilter === 'all') {
+      products = [
+        ...(trendingData.face  || []),
+        ...(trendingData.chest || []),
+        ...(trendingData.feet  || []),
+        ...(trendingData.neck  || []),
+        ...(trendingData.legs  || []),
+      ].slice(0, 6);
+    } else {
+      products = (trendingData[currentFilter] || []).slice(0, 6);
+    }
+
+    if (products.length === 0) {
+      grid.innerHTML = '<p style="grid-column:span 6;text-align:center;color:var(--text-mid);padding:32px">No products yet — add them in the admin panel!</p>';
+      return;
+    }
+
+    grid.innerHTML = products.map(p => `
+      <div class="t-card">
+        ${p.image
+          ? `<img src="${p.image}" class="t-card-img" alt="${p.name}" onerror="this.style.display='none'"/>`
+          : `<div class="t-card-placeholder">${catEmojis[p.category]||'👗'}</div>`
+        }
+        <div class="t-card-body">
+          <div class="t-card-name">${p.name}</div>
+          <div class="t-card-brand">${p.brand}</div>
+          <div class="t-card-price">₹${parseInt(p.price).toLocaleString('en-IN')}</div>
+          ${p.trend_label ? `<div class="t-card-trend">${p.trend_label}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  renderTrending();
+
+  /* ── TOAST ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* Auto open modal */
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('modal') === 'login')    openModal('login');
+  if (urlParams.get('modal') === 'register') openModal('register');
+</script>
+</body>
+</html>
